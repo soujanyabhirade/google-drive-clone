@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,62 +11,53 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
+  id        String   @id @default(cuid())
+  email     String   @unique
   password  String
   firstName String
   lastName  String
   files     File[]
   folders   Folder[]
   shares    Share[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model File {
-  id        String     @id @default(uuid())
-  name      String
-  size      Int
-  mimeType  String
-  s3Key     String     @unique
-  folder    Folder?    @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  folderId  String?
-  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId   String
-  shares    Share[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  @@index([ownerId])
-  @@index([folderId])
+  id       String  @id @default(cuid())
+  name     String
+  size     Int
+  mimeType String
+  fileUrl  String
+  owner    User    @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId  String
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  folderId String?
+  shares   Share[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Folder {
-  id        String     @id @default(uuid())
-  name      String
-  parent    Folder?    @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
-  parentId  String?
-  children  Folder[]   @relation("ParentChild")
-  files     File[]
-  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId   String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  @@index([ownerId])
-  @@index([parentId])
+  id       String   @id @default(cuid())
+  name     String
+  parent   Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String?
+  children Folder[] @relation("FolderHierarchy")
+  owner    User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId  String
+  files    File[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Share {
-  id         String   @id @default(uuid())
-  file       File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  id         String @id @default(cuid())
+  file       File   @relation(fields: [fileId], references: [id], onDelete: Cascade)
   fileId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  permission String   @default("VIEW")
+  permission String @default("VIEW")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
-  @@unique([fileId, userId])
-  @@index([userId])
 }

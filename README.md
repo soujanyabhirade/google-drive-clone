@@ -1,80 +1,94 @@
-# Google Drive Clone 🚀
+# 🚀 Google Drive Clone
 
-A full-stack web application that mimics Google Drive functionality. Built with React, Node.js, PostgreSQL, and AWS S3.
+A full-stack file storage application built with React, Express, PostgreSQL, and AWS S3.
 
-## ✨ Features
+## 📋 Features
 
-### Core Features
-- ✅ **User Authentication**: Secure register/login with JWT
-- ✅ **File Management**: Upload, download, delete, rename files
-- ✅ **Folder Organization**: Create, rename, delete folders with hierarchy
-- ✅ **File Sharing**: Share files with custom permissions (VIEW, EDIT, ADMIN)
-- ✅ **Search & Filter**: Search files and folders by name, type, date
-- ✅ **Responsive UI**: Works on desktop and tablet
-- ✅ **Real-time Updates**: WebSocket integration for live updates
-- ✅ **File Preview**: View images, PDFs, and document previews
+✅ **User Authentication**
+- User registration and login
+- JWT-based authentication
+- Secure password hashing with bcryptjs
 
-### Advanced Features (Coming Soon)
-- 📋 Trash/Recycle bin with restore
-- 📝 File versioning and history
-- 🔄 Real-time collaboration
-- 📱 Mobile app (React Native)
-- 🌙 Dark mode
+✅ **File Management**
+- Upload files with drag-and-drop
+- Delete files
+- Download files
+- View file metadata
+
+✅ **Folder Management**
+- Create folders
+- Delete folders
+- Nested folder structure
+- Organize files by folders
+
+✅ **File Sharing**
+- Share files with other users
+- Set permissions (VIEW, EDIT, ADMIN)
+- Revoke shares
+
+✅ **Real-time Updates**
+- WebSocket integration with Socket.io
+- Real-time file upload/delete notifications
+
+✅ **Responsive Design**
+- Mobile-friendly UI
+- Tailwind CSS styling
+- Intuitive dashboard
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **React** 18 with TypeScript
-- **Redux Toolkit** for state management
-- **Tailwind CSS** for styling
-- **React Router** for navigation
-- **Axios** for API calls
-- **Socket.io-client** for real-time updates
+**Frontend:**
+- React 18
+- TypeScript
+- Redux Toolkit
+- Tailwind CSS
+- Axios
+- Socket.io Client
 
-### Backend
-- **Node.js** with Express.js
-- **TypeScript** for type safety
-- **PostgreSQL** for database
-- **Prisma ORM** for database queries
-- **AWS S3** for file storage
-- **JWT** for authentication
-- **Socket.io** for WebSocket
+**Backend:**
+- Node.js + Express
+- TypeScript
+- PostgreSQL
+- Prisma ORM
+- JWT Authentication
+- AWS S3 (optional)
+- Socket.io
 
-### DevOps
-- **Docker** & **Docker Compose** for containerization
-- **Environment variables** for configuration
+**DevOps:**
+- Docker
+- Docker Compose
+- PostgreSQL Docker Image
 
-## 📋 Prerequisites
+## 📦 Installation
 
-- Node.js >= 16
-- PostgreSQL >= 12 (or use Docker)
-- AWS Account with S3 access
-- Git
+### Prerequisites
+- Node.js 18+
+- Docker & Docker Compose (optional)
+- PostgreSQL 15+ (or use Docker)
+- AWS Account (optional, for S3)
 
-## 🚀 Quick Start
-
-### Option 1: Using Docker (Recommended)
+### Quick Start with Docker (Recommended)
 
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/google-drive-clone.git
+# 1. Clone the repository
+git clone https://github.com/soujanyabhirade/google-drive-clone.git
 cd google-drive-clone
 
-# Copy environment file
+# 2. Setup environment variables
 cp .env.example .env
 
-# Edit .env with your AWS S3 credentials and database URL
-nano .env
-
-# Start all services
+# 3. Start all services
 docker-compose up
+
+# 4. Run database migrations (in another terminal)
+docker exec google-drive-backend npx prisma migrate dev --name init
 ```
 
 Then visit: **http://localhost:3000**
 
-### Option 2: Manual Setup
+### Manual Setup
 
-#### Backend Setup
+#### Backend
 
 ```bash
 cd backend
@@ -82,23 +96,21 @@ cd backend
 # Install dependencies
 npm install
 
-# Setup environment
+# Setup environment variables
 cp .env.example .env
-# Edit .env with your credentials
-
-# Run database migrations
-npx prisma migrate dev --name init
+# Edit .env with your database URL and other configs
 
 # Generate Prisma client
 npx prisma generate
 
-# Start backend server
+# Run migrations
+npx prisma migrate dev --name init
+
+# Start development server
 npm run dev
 ```
 
-Backend will run on **http://localhost:5000**
-
-#### Frontend Setup
+#### Frontend
 
 ```bash
 cd frontend
@@ -106,255 +118,210 @@ cd frontend
 # Install dependencies
 npm install
 
-# Create .env file
-echo "REACT_APP_API_URL=http://localhost:5000" > .env
-
-# Start frontend
+# Start development server
 npm start
 ```
 
-Frontend will run on **http://localhost:3000**
-
-## 📁 Project Structure
-
-```
-google-drive-clone/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/     # Route handlers
-│   │   ├── middleware/      # Auth, validation, error handling
-│   │   ├── routes/          # API routes
-│   │   ├── services/        # Business logic
-│   │   ├── types/           # TypeScript types
-│   │   ├── utils/           # Helper functions
-│   │   └── index.ts         # Entry point
-│   ├── prisma/
-│   │   ├── schema.prisma    # Database schema
-│   │   └── migrations/      # Database migrations
-│   ├── .env.example         # Environment template
-│   ├── Dockerfile           # Backend container
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/      # Reusable components
-│   │   ├── pages/           # Page components
-│   │   ├── store/           # Redux store
-│   │   ├── services/        # API services
-│   │   ├── types/           # TypeScript types
-│   │   ├── utils/           # Helper functions
-│   │   ├── App.tsx
-│   │   └── index.tsx
-│   ├── public/
-│   ├── .env.example         # Environment template
-│   ├── Dockerfile           # Frontend container
-│   ├── tailwind.config.js
-│   ├── package.json
-│   └── tsconfig.json
-│
-├── docker-compose.yml       # Docker services
-├── .gitignore
-└── README.md
-```
-
-## 🔐 Environment Variables
+## 🔑 Environment Variables
 
 ### Backend (.env)
-```
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/google_drive_clone"
-
-# JWT
-JWT_SECRET="your-secret-key-here-change-in-production"
-JWT_EXPIRY="7d"
-
-# AWS S3
-AWS_ACCESS_KEY_ID="your-aws-key"
-AWS_SECRET_ACCESS_KEY="your-aws-secret"
-AWS_REGION="us-east-1"
-AWS_S3_BUCKET="your-bucket-name"
-
-# Server
+```env
+NODE_ENV=development
 PORT=5000
-NODE_ENV="development"
-CLIENT_URL="http://localhost:3000"
+DATABASE_URL=postgresql://user:password@localhost:5432/google_drive_clone
+JWT_SECRET=your-super-secret-jwt-key
+JWT_EXPIRY=7d
+AWS_ACCESS_KEY_ID=your-aws-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret
+AWS_REGION=us-east-1
+AWS_S3_BUCKET=your-bucket-name
+FRONTEND_URL=http://localhost:3000
+MAX_FILE_SIZE=52428800
 ```
 
 ### Frontend (.env)
-```
+```env
 REACT_APP_API_URL=http://localhost:5000
-REACT_APP_MAX_FILE_SIZE=104857600
 ```
 
 ## 📚 API Documentation
 
 ### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `POST /api/auth/refresh` - Refresh JWT token
-- `POST /api/auth/logout` - Logout user
+
+**Register**
+```
+POST /api/auth/register
+Body: { email, password, firstName, lastName }
+```
+
+**Login**
+```
+POST /api/auth/login
+Body: { email, password }
+```
 
 ### Files
-- `GET /api/files` - List files in folder
-- `POST /api/files/upload` - Upload file
-- `GET /api/files/:id/download` - Download file
-- `DELETE /api/files/:id` - Delete file
-- `PUT /api/files/:id` - Update file (rename)
-- `POST /api/files/:id/share` - Share file
+
+**Get Files**
+```
+GET /api/files?folderId=<optional>
+Headers: { Authorization: Bearer <token> }
+```
+
+**Upload File**
+```
+POST /api/files/upload
+Headers: { Authorization: Bearer <token> }
+Body: FormData { file, folderId: <optional> }
+```
+
+**Delete File**
+```
+DELETE /api/files/<fileId>
+Headers: { Authorization: Bearer <token> }
+```
 
 ### Folders
-- `GET /api/folders` - List all folders
-- `POST /api/folders` - Create folder
-- `DELETE /api/folders/:id` - Delete folder
-- `PUT /api/folders/:id` - Update folder (rename)
+
+**Get Folders**
+```
+GET /api/folders
+Headers: { Authorization: Bearer <token> }
+```
+
+**Create Folder**
+```
+POST /api/folders
+Headers: { Authorization: Bearer <token> }
+Body: { name, parentId: <optional> }
+```
+
+**Delete Folder**
+```
+DELETE /api/folders/<folderId>
+Headers: { Authorization: Bearer <token> }
+```
 
 ### Sharing
-- `GET /api/sharing` - List shared files
-- `POST /api/sharing/:id/revoke` - Revoke share
-- `PUT /api/sharing/:id` - Update permissions
 
-## 🧪 Testing
-
-```bash
-# Backend tests
-cd backend
-npm test
-
-# Frontend tests
-cd frontend
-npm test
-
-# E2E tests
-npm run test:e2e
+**Share File**
+```
+POST /api/sharing/share
+Headers: { Authorization: Bearer <token> }
+Body: { fileId, userId, permission }
 ```
 
-## 🔧 Development
-
-### Database Migrations
-```bash
-# Create new migration
-npx prisma migrate dev --name add_feature
-
-# View database
-npx prisma studio
+**Get Shares**
+```
+GET /api/sharing/<fileId>
+Headers: { Authorization: Bearer <token> }
 ```
 
-### Code Quality
-```bash
-# Lint code
-npm run lint
-
-# Format code
-npm run format
-
-# Type check
-npm run type-check
+**Revoke Share**
 ```
-
-## 📦 Building for Production
-
-### Backend
-```bash
-cd backend
-npm run build
-npm start
+DELETE /api/sharing/<shareId>
+Headers: { Authorization: Bearer <token> }
 ```
-
-### Frontend
-```bash
-cd frontend
-npm run build
-# Serve with: npm install -g serve
-serve -s build
-```
-
-## 🚢 Deployment
-
-### Deploy to Heroku
-```bash
-heroku create your-app-name
-heroku addons:create heroku-postgresql:hobby-dev
-heroku config:set JWT_SECRET=your-secret
-heroku config:set AWS_ACCESS_KEY_ID=your-key
-# ... add other env variables
-git push heroku main
-```
-
-### Deploy to AWS EC2
-1. Create EC2 instance
-2. Install Docker and Docker Compose
-3. Clone repository
-4. Set environment variables
-5. Run `docker-compose up -d`
 
 ## 🐛 Troubleshooting
 
-### PostgreSQL connection error
+### "Cannot find module" errors
 ```bash
-# Check if PostgreSQL is running
-sudo service postgresql status
+# Reinstall dependencies
+cd backend
+rm -rf node_modules package-lock.json
+npm install
 
-# Start PostgreSQL
-sudo service postgresql start
+# Generate Prisma client
+npx prisma generate
+```
+
+### Database connection errors
+```bash
+# Check PostgreSQL is running
+# If using Docker:
+docker logs google-drive-db
+
+# Verify DATABASE_URL in .env
+echo $DATABASE_URL
 ```
 
 ### Port already in use
 ```bash
-# Kill process on port 5000 (backend)
-lsof -ti:5000 | xargs kill -9
-
-# Kill process on port 3000 (frontend)
-lsof -ti:3000 | xargs kill -9
+# Change port in .env or docker-compose.yml
+# Then restart services
+docker-compose restart
 ```
 
-### AWS S3 errors
-- Verify AWS credentials in .env
-- Check S3 bucket permissions
-- Ensure bucket name is correct
-- Check AWS region matches
-
-### Docker issues
+### Frontend can't connect to backend
 ```bash
-# Rebuild containers
-docker-compose build --no-cache
-
-# View logs
-docker-compose logs -f
-
-# Clean up
-docker-compose down -v
+# Check REACT_APP_API_URL in frontend .env
+# Should match your backend URL
+# Rebuild frontend
+cd frontend
+npm run build
 ```
 
-## 📝 Contributing
+## 🚀 Deployment
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+### Deploy Backend to Heroku
+
+```bash
+# 1. Create Heroku app
+heroku create your-app-name
+
+# 2. Add PostgreSQL addon
+heroku addons:create heroku-postgresql:hobby-dev
+
+# 3. Set environment variables
+heroku config:set JWT_SECRET=your-secret
+heroku config:set FRONTEND_URL=your-frontend-url
+
+# 4. Deploy
+git push heroku main
+```
+
+### Deploy Frontend to Vercel
+
+```bash
+# 1. Push to GitHub
+git push origin main
+
+# 2. Connect to Vercel
+# Visit https://vercel.com/import
+# Select your repository
+
+# 3. Add environment variables
+REACT_APP_API_URL=your-backend-url
+
+# 4. Deploy
+```
+
+## 📈 Future Enhancements
+
+- [ ] File preview (images, PDFs, documents)
+- [ ] Advanced search and filtering
+- [ ] File versioning and restore
+- [ ] Trash/Recycle bin
+- [ ] Real-time collaboration
+- [ ] Dark mode
+- [ ] Mobile app (React Native)
+- [ ] Comments and annotations
+- [ ] Advanced sharing options
+- [ ] Activity log
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-MIT License - feel free to use this project for personal and commercial purposes.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 🤝 Support
+## 💬 Support
 
-Have questions? Open an issue on GitHub or contact the maintainer.
-
-## 🎯 Roadmap
-
-- [ ] Advanced search with filters
-- [ ] File versioning
-- [ ] Trash functionality
-- [ ] Real-time collaboration
-- [ ] Mobile app
-- [ ] Dark mode
-- [ ] Activity log
-- [ ] Backup & restore
-- [ ] API rate limiting
-- [ ] Admin dashboard
+If you have any questions or issues, please open an issue on GitHub.
 
 ---
 
-**Made with ❤️ by Soujanya Bhirade**
+**Built with ❤️ by Soujanya Bhirade**

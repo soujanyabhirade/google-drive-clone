@@ -1,16 +1,35 @@
-import express, { Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { verifyToken } from '../middleware/auth';
 import { v4 as uuidv4 } from 'uuid';
 
-const router = express.Router();
+const router = Router();
 const prisma = new PrismaClient();
 
+// Get all folders for user
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const folders = await prisma.folder.findMany({
+      where: {
+        ownerId: req.userId,
+      },
+    });
+
+    res.json({
+      success: true,
+      folders,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to fetch folders',
+    });
+  }
+});
+
 // Create folder
-router.post('/', verifyToken, async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const { name, parentId } = req.body;
-    const userId = req.user?.userId;
 
     if (!name) {
       return res.status(400).json({
@@ -24,7 +43,7 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
         id: uuidv4(),
         name,
         parentId: parentId || null,
-        ownerId: userId || '',
+        ownerId: req.userId as string,
       },
     });
 
@@ -36,49 +55,37 @@ router.post('/', verifyToken, async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: error.message,
-    });
-  }
-});
-
-// Get all folders
-router.get('/', verifyToken, async (req: Request, res: Response) => {
-  try {
-    const userId = req.user?.userId;
-
-    const folders = await prisma.folder.findMany({
-      where: { ownerId: userId },
-    });
-
-    res.json({
-      success: true,
-      folders,
-    });
-  } catch (error: any) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
+      message: error.message || 'Failed to create folder',
     });
   }
 });
 
 // Delete folder
-router.delete('/:id', verifyToken, async (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const userId = req.user?.userId;
 
-    // Find folder
-    const folder = await prisma.folder.findUnique({ where: { id } });
-    if (!folder || folder.ownerId !== userId) {
+    const folder = await prisma.folder.findUnique({
+      where: { id },
+    });
+
+    if (!folder) {
       return res.status(404).json({
         success: false,
         message: 'Folder not found',
       });
     }
 
-    // Delete folder
-    await prisma.folder.delete({ where: { id } });
+    if (folder.ownerId !== req.userId) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized',
+      });
+    }
+
+    await prisma.folder.delete({
+      where: { id },
+    });
 
     res.json({
       success: true,
@@ -87,7 +94,7 @@ router.delete('/:id', verifyToken, async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || 'Failed to delete folder',
     });
   }
 });

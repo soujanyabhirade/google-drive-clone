@@ -1,51 +1,40 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: google-drive-postgres
+    container_name: google-drive-db
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: google_drive_clone
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    networks:
+      - google-drive-network
 
-  # Backend API
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: google-drive-backend
     environment:
-      DATABASE_URL: postgresql://user:password@postgres:5432/google_drive_clone
-      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
-      JWT_EXPIRY: 7d
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_REGION: ${AWS_REGION}
-      AWS_S3_BUCKET: ${AWS_S3_BUCKET}
-      PORT: 5000
       NODE_ENV: development
-      CLIENT_URL: http://localhost:3000
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/google_drive_clone
+      JWT_SECRET: your-super-secret-jwt-key
+      PORT: 5000
+      FRONTEND_URL: http://localhost:3000
     ports:
-      - "5000:5000"
+      - '5000:5000'
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
     volumes:
       - ./backend/src:/app/src
-    command: npm run dev
+    networks:
+      - google-drive-network
 
-  # Frontend Application
   frontend:
     build:
       context: ./frontend
@@ -53,18 +42,16 @@ services:
     container_name: google-drive-frontend
     environment:
       REACT_APP_API_URL: http://localhost:5000
-      REACT_APP_MAX_FILE_SIZE: 104857600
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - backend
-    volumes:
-      - ./frontend/src:/app/src
-    command: npm start
+    networks:
+      - google-drive-network
 
 volumes:
   postgres_data:
 
 networks:
-  default:
-    name: google-drive-network
+  google-drive-network:
+    driver: bridge

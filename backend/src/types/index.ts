@@ -1,9 +1,9 @@
 export interface User {
   id: string;
   email: string;
-  password: string;
   firstName: string;
   lastName: string;
+  password: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -13,9 +13,9 @@ export interface File {
   name: string;
   size: number;
   mimeType: string;
-  s3Key: string;
-  folderId: string | null;
+  fileUrl: string;
   ownerId: string;
+  folderId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -38,7 +38,12 @@ export interface Share {
   updatedAt: Date;
 }
 
-export interface AuthPayload {
+export interface JWTPayload {
+  userId: string;
+  email: string;
+}
+
+export interface AuthRequest {
   userId: string;
   email: string;
 }
