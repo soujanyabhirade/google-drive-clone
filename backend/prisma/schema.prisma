@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String
+  firstName String
+  lastName  String
+  files     File[]
+  folders   Folder[]
+  shares    Share[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model File {
+  id        String     @id @default(uuid())
+  name      String
+  size      Int
+  mimeType  String
+  s3Key     String     @unique
+  folder    Folder?    @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId  String?
+  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+  shares    Share[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([ownerId])
+  @@index([folderId])
+}
+
+model Folder {
+  id        String     @id @default(uuid())
+  name      String
+  parent    Folder?    @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId  String?
+  children  Folder[]   @relation("ParentChild")
+  files     File[]
+  owner     User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId   String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([ownerId])
+  @@index([parentId])
+}
+
+model Share {
+  id         String   @id @default(uuid())
+  file       File     @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  fileId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  permission String   @default("VIEW")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([fileId, userId])
+  @@index([userId])
+}
